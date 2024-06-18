@@ -23,3 +23,8 @@ class SshBatchClient:
         command = f"kubectl get job {name} --namespace={namespace} -o json"
         res = self.run_command(command)
         return models.V1Job.model_validate_json(res).model_dump_kube()
+
+    def delete_namespaced_job(self, name: str, namespace: str, **kwargs) -> str:
+        command = f"kubectl delete job {name} --namespace={namespace}"
+        res = self.run_command(command)
+        return res

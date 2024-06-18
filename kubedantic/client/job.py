@@ -35,14 +35,14 @@ class Job:
         self.__namespace = __namespace
         self.__manifest.metadata.namespace = __namespace
 
-    def delete(self, client_api: client.BatchV1Api) -> None:
+    def delete(self, client_api: client.BatchV1Api) -> str:
         options = client.V1DeleteOptions(propagation_policy='Foreground', grace_period_seconds=5)
         api_response: client.V1Status = client_api.delete_namespaced_job(
             name=self.name,
             namespace=self.__namespace,
             body=options,
         )
-        return api_response.status
+        return api_response
 
     def read_pod_logs(self, client_api: client.CoreV1Api) -> None:
         pods: client.V1PodList = client_api.list_namespaced_pod(
