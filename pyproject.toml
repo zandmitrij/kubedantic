@@ -41,7 +41,8 @@ classifiers = [
 ]
 
 [tool.setuptools.packages.find]
-where = ["kubedantic"]
+where = ["."]
+include = ["kubedantic*"]
 
 
 [tool.black]
