@@ -2,7 +2,7 @@ from .configmap import ConfigMap
 from .secret import Secret
 from .job import Job
 from .create import create_from_yaml, create_from_content
-from .api import SShApiClient, SshBatchClient, ClientProtocol, BatchClientProtocol
+from .api import SShApiClient, SshBatchClient, ClientProtocol, BatchClientProtocol, V1ApiClient, V1BatchApiClient
 
 
 __all__ = [
@@ -15,4 +15,6 @@ __all__ = [
     'SshBatchClient',
     'ClientProtocol',
     'BatchClientProtocol',
+    'V1ApiClient',
+    'V1BatchApiClient',
 ]
