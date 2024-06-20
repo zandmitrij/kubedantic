@@ -65,7 +65,13 @@ class Job:
         api_response: client.V1Job = client_api.read_namespaced_job(name=self.name, namespace=self.__namespace)
         return api_response.status
 
-    def run(self, client_api: ClientProtocol, job_client_api: client.BatchV1Api, delay: int = 5) -> None:
+    def run(
+        self,
+        client_api: ClientProtocol,
+        job_client_api: client.BatchV1Api,
+        delete_after: bool = False,
+        delay: int = 5,
+    ) -> None:
         status = self.create(job_client_api)
         print(f"Job created. status='{status}'")
 
@@ -75,5 +81,8 @@ class Job:
             status = self.get_status(job_client_api)
             time.sleep(delay)
 
-        status = self.delete(job_client_api)
-        print(f"Job {self.name} deleted. status='{status}'")
+        if delete_after:
+            status = self.delete(job_client_api)
+            print(f"Job {self.name} deleted. status='{status}'")
+        else:
+            print(f"Job {self.name} finished. {status = }")
