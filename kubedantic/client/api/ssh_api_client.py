@@ -13,7 +13,8 @@ class SShApiClient:
             return ssh_client.run_command(command)
 
     def _create(self, namespace: str, body: str, **kwargs) -> str:
-        command = f"""echo "{body}" | kubectl create -n {namespace} -o json -f -"""
+        x = body.replace('$', '\$')
+        command = f"""echo "{x}" | kubectl create -n {namespace} -o json -f -"""
         return self.run_command(command)
 
     def create_namespaced_secret(self, namespace: str, body: models.V1Secret, **kwargs) -> client.V1Secret:

@@ -13,7 +13,7 @@ class SshBatchClient:
             return ssh_client.run_command(command)
 
     def create_namespaced_job(self, namespace: str, body: models.V1Job, **kwargs) -> client.V1Job:
-        x = body.to_yaml_str()
+        x = body.to_yaml_str().replace('$', '\$')
         command = f"""echo "{x}" | kubectl create -n {namespace} -o json -f -"""
         res = self.run_command(command)
         print(res)
