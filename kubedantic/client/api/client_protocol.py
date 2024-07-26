@@ -23,3 +23,6 @@ class ClientProtocol(tp.Protocol):
 
     def delete_namespaced_config_map(self, name: str, namespace: str, **kwargs) -> client.V1Status:
         pass
+
+    def read_namespaced_log(self, name: str, namespace: str, **kwargs) -> str:
+        pass

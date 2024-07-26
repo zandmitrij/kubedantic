@@ -42,3 +42,8 @@ class SShApiClient:
     def delete_namespaced_config_map(self, name: str, namespace: str, **kwargs) -> str:
         command = f"kubectl delete cm {name} --namespace={namespace} "
         return self.run_command(command)
+
+    def read_namespaced_log(self, name: str, namespace: str, **kwargs):
+        command = f"kubectl -n {namespace} logs job/{name}"
+        res = self.run_command(command)
+        return res
