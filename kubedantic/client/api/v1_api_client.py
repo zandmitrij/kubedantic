@@ -1,4 +1,5 @@
 from kubernetes import client
+from kubernetes.watch import watch
 
 from kubedantic.client import models
 
@@ -45,3 +46,30 @@ class V1ApiClient:
     def delete_namespaced_config_map(self, name: str, namespace: str, **kwargs) -> str:
         res = self._client.read_namespaced_config_map(name=name, namespace=namespace, **kwargs)
         return res
+
+    def read_namespaced_log(self, name: str, namespace: str, **kwargs) -> str:
+        pods: client.V1PodList = self._client.list_namespaced_pod(namespace=namespace, **kwargs)
+        # It looks like it might be created several pods for a job. Let's check out all.
+        logs = []
+        for pod in pods.items:
+            pod_name = pod.metadata.name
+            if '-'.join(pod_name.split('-')[:-1]) == name:
+                w = watch.Watch()
+                for request in w.stream(
+                        self._client.read_namespaced_pod_log,
+                        name=pod_name, namespace=namespace, _preload_content=False, **kwargs):
+                    # There are some decoding issues when reading model logs.
+                    # It looks like python cannot decode tqdm process bars using utf-8.
+                    # Thus, I use _preload_content=False which means we return a HTTPResponse object
+                    # and try to decode it myself
+                    log_bytes = request.read()
+                    request.close()  # don't forget to close the connection
+                    try:
+                        log = log_bytes.decode("utf-8")
+                    except UnicodeDecodeError:
+                        try:
+                            log = log_bytes.decode('cp737')
+                        except UnicodeDecodeError:
+                            log = str(log_bytes)
+                    logs.append(f"{pod_name}: {log}")
+        return '\n\n'.join(logs)

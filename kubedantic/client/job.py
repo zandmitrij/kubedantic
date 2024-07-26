@@ -44,32 +44,8 @@ class Job:
         )
         return api_response
 
-    def read_pod_logs(self, client_api: client.CoreV1Api) -> None:
-        pods: client.V1PodList = client_api.list_namespaced_pod(
-            namespace=self.__namespace, label_selector=self.label_selector
-        )
-        # It looks like it might be created several pods for a job. Let's check out all.
-        for pod in pods.items:
-            pod_name = pod.metadata.name
-
-            w = watch.Watch()
-            for request in w.stream(
-                    client_api.read_namespaced_pod_log,
-                    name=pod_name, namespace=self.__namespace, follow=True, _preload_content=False):
-                # There are some decoding issues when reading model logs.
-                # It looks like python cannot decode tqdm process bars using utf-8.
-                # Thus, I use _preload_content=False which means we return a HTTPResponse object
-                # and try to decode it myself
-                log_bytes = request.read()
-                request.close()  # don't forget to close the connection
-                try:
-                    log = log_bytes.decode("utf-8")
-                except UnicodeDecodeError:
-                    try:
-                        log = log_bytes.decode('cp737')
-                    except UnicodeDecodeError:
-                        log = str(log_bytes)
-                print(f"{pod_name}: {log}")
+    def read_pod_logs(self, client_api: ClientProtocol) -> str:
+        return client_api.read_namespaced_log(name=self.name, namespace=self.__namespace)
 
     def create(self, client_api: BatchClientProtocol) -> client.V1Job:
         api_response = client_api.create_namespaced_job(namespace=self.__namespace, body=self.__manifest)
