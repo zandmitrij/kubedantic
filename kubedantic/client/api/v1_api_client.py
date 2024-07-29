@@ -2,6 +2,7 @@ from kubernetes import client
 from kubernetes.watch import watch
 
 from kubedantic.client import models
+from kubedantic.ssh_utils import decode
 
 
 class V1ApiClient:
@@ -64,12 +65,6 @@ class V1ApiClient:
                     # and try to decode it myself
                     log_bytes = request.read()
                     request.close()  # don't forget to close the connection
-                    try:
-                        log = log_bytes.decode("utf-8")
-                    except UnicodeDecodeError:
-                        try:
-                            log = log_bytes.decode('cp737')
-                        except UnicodeDecodeError:
-                            log = str(log_bytes)
+                    log = decode(log_bytes)
                     logs.append(f"{pod_name}: {log}")
         return '\n\n'.join(logs)
