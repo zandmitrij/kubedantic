@@ -3,6 +3,17 @@ from typing_extensions import Self
 import paramiko
 
 
+def decode(encoded: bytes) -> str:
+    try:
+        result = encoded.decode('utf-8')
+    except UnicodeDecodeError:
+        try:
+            result = encoded.decode('cp737')
+        except UnicodeDecodeError:
+            result = str(encoded)
+    return result
+
+
 class SshClientError(Exception):
     pass
 
@@ -26,8 +37,8 @@ class SshClient:
 
     def run_command(self, command: str) -> str:
         _stdin, stdout, stderr = self.__ssh.exec_command(command)
-        result = stdout.read().decode('utf-8').strip()
-        error = stderr.read().decode('utf-8').strip()
+        result = decode(stdout.read()).strip()
+        error = decode(stderr.read()).strip()
         if error:
             raise SshClientError(error)
         return result
