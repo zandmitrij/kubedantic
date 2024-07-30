@@ -35,10 +35,12 @@ class SshClient:
     def __exit__(self, exc_type, exc_value, traceback) -> None:
         self.__ssh.close()
 
-    def run_command(self, command: str) -> str:
+    def run_command(self, command: str, raise_error: bool) -> str:
         _stdin, stdout, stderr = self.__ssh.exec_command(command)
         result = decode(stdout.read()).strip()
         error = decode(stderr.read()).strip()
-        if error:
+        if error and raise_error:
             raise SshClientError(error)
+        elif error:
+            result = f"{error}\n\n{result}"
         return result
