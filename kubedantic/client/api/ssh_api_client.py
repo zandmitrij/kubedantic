@@ -8,9 +8,9 @@ class SShApiClient:
     def __init__(self, client: SshClient):
         self.ssh_client = client
 
-    def run_command(self, command: str) -> str:
+    def run_command(self, command: str, raise_error: bool = True) -> str:
         with self.ssh_client as ssh_client:
-            return ssh_client.run_command(command)
+            return ssh_client.run_command(command, raise_error=raise_error)
 
     def _create(self, namespace: str, body: str, **kwargs) -> str:
         x = body.replace('$', '\$')
@@ -45,5 +45,5 @@ class SShApiClient:
 
     def read_namespaced_log(self, name: str, namespace: str, **kwargs):
         command = f"kubectl -n {namespace} logs job/{name}"
-        res = self.run_command(command)
+        res = self.run_command(command, raise_error=kwargs.get('raise_error', False))
         return res

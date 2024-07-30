@@ -8,9 +8,9 @@ class SshBatchClient:
     def __init__(self, ssh_client: SshClient) -> None:
         self.ssh_client = ssh_client
 
-    def run_command(self, command: str) -> str:
+    def run_command(self, command: str, raise_error: bool = True) -> str:
         with self.ssh_client as ssh_client:
-            return ssh_client.run_command(command)
+            return ssh_client.run_command(command, raise_error=raise_error)
 
     def create_namespaced_job(self, namespace: str, body: models.V1Job, **kwargs) -> client.V1Job:
         x = body.to_yaml_str().replace('$', '\$')
