@@ -61,6 +61,7 @@ class Job:
         job_client_api: client.BatchV1Api,
         delete_after: bool = False,
         delay: int = 5,
+        raise_err: bool = True
     ) -> None:
         status = self.create(job_client_api)
         print(f"Job created. status='{status}'")
@@ -75,5 +76,5 @@ class Job:
         else:
             print(f"Job {self.name} finished. {status = }")
 
-        if status.failed:
+        if status.failed and raise_err:
             raise RuntimeError("Job has failed. Please see logs to learn more.")
