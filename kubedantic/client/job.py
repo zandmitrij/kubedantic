@@ -70,7 +70,10 @@ class Job:
             time.sleep(delay)
 
         if delete_after:
-            status = self.delete(job_client_api)
-            print(f"Job {self.name} deleted. status='{status}'")
+            delete_status = self.delete(job_client_api)
+            print(f"Job {self.name} deleted. status='{delete_status}'")
         else:
             print(f"Job {self.name} finished. {status = }")
+
+        if status.failed:
+            raise RuntimeError("Job has failed. Please see logs to learn more.")
