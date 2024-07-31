@@ -65,8 +65,6 @@ class Job:
         status = self.create(job_client_api)
         print(f"Job created. status='{status}'")
 
-        # self.read_pod_logs(client_api)
-
         while not (status.succeeded is not None or status.failed is not None):
             status = self.get_status(job_client_api)
             time.sleep(delay)
