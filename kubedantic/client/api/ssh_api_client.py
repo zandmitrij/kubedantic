@@ -31,6 +31,10 @@ class SShApiClient:
         return self.run_command(command)
 
     def create_namespaced_config_map(self, namespace: str, body: models.V1ConfigMap, **kwargs) -> client.V1ConfigMap:
+        data = body.data
+        for key in data:
+            if key.endswith('.hcl'):
+                data[key] = data[key].replace('\n', '\\n')
         res = self._create(namespace, body.to_yaml_str(), **kwargs)
         return models.V1ConfigMap.model_validate_json(res).model_dump_kube()
 
